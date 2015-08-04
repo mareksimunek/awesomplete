@@ -41,7 +41,7 @@ abbr {
 	cursor: help;
 }
 
-input, button {
+input, button, .textarea {
 	font: inherit;
 	text-shadow: inherit;
 }
@@ -55,7 +55,7 @@ button {
 	box-shadow: 0 1px white inset, 0 .3em .3em -.3em rgba(0,0,0,.3);
 }
 
-input {
+input, .textarea {
 	width: 12em;
 	padding: .1em .3em;
 	border: 0;
@@ -71,7 +71,7 @@ input {
 	}
 }
 
-input:focus {
+input:focus, .textarea:focus {
 	outline: none;
 	border: 1px solid #58a;
 	animation: pulsate 2s infinite alternate linear;

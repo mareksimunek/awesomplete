@@ -6,12 +6,18 @@
 }
 
 div.awesomplete {
-	display: inline-block;
+
 	position: relative;
 }
 
-div.awesomplete > input {
+div.awesomplete > input, .textarea {
 	display: block;
+}
+
+.mention{
+  font-weight: normal;
+  background: #d8dfea;
+  color:  @black;
 }
 
 div.awesomplete > ul {
@@ -88,10 +94,10 @@ div.awesomplete > ul:empty {
 		}
 		
 		div.awesomplete li:hover mark {
-			background: hsl(68, 100%, 41%);
+			background: hsl(68, 101%, 41%);
 		}
 		
 		div.awesomplete li[aria-selected="true"] mark {
-			background: hsl(86, 100%, 21%);
+			background: hsl(86, 102%, 21%);
 			color: inherit;
 		}

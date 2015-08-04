@@ -24,6 +24,18 @@ var _ = function (input, o) {
 		autoFirst: false,
 		filter: _.FILTER_CONTAINS,
 		sort: _.SORT_BYLENGTH,
+		mentionChar : null,  // turn on mention feature if its not null
+		mentionFilter : function(){
+			var text = this.input.innerHTML.replace(/&nbsp;/g, ' ')
+			var regex = new RegExp('(<br>|<br><\/br>|\\s|^|\\n)'+this.mentionChar+'[^(\\s|<)]*');
+			var match = regex.exec(text);
+			if (!(typeof match !== "undefined" && match !== null)){
+				return null;
+			}
+			match.charIndex = match[0].indexOf(this.mentionChar);
+			return match;
+			
+		}, 
 		item: function (text, input) {
 			return $.create("li", {
 				innerHTML: text.replace(RegExp($.regExpEscape(input.trim()), "gi"), "<mark>$&</mark>"),
@@ -203,7 +215,7 @@ _.prototype = {
 			});
 
 			if (!prevented) {
-				this.replace(selected.textContent);
+				this.replace(selected.textContent, selected.dataset);
 				this.close();
 				$.fire(this.input, "awesomplete-selectcomplete");
 			}
@@ -213,8 +225,28 @@ _.prototype = {
 	evaluate: function() {
 		var me = this;
 		var value = this.input.value;
+		var startEval = true;
+		if(this.mentionChar){  // is mention turned on
+			value = this.input.innerHTML
+			var match = this.mentionFilter(value);  //get matched obj by mention filter
+			console.log(match);
+			
+			if(match){
+				valArr = match[0].split(this.mentionChar);  // get string behind mentionChar
+				if(valArr.length < 1){
+					return;
+				}
+				value = valArr[1];
+				console.log('match ' + match.index + ', value '+ value);
+				startEval = true;
+			}else{
+				startEval= false;
+			}
 
-		if (value.length >= this.minChars && this._list.length > 0) {
+		}
+
+		if ( startEval && value.length >= this.minChars && this._list.length > 0) {
+			
 			this.index = -1;
 			// Populate list with options that match
 			this.ul.innerHTML = "";
@@ -287,10 +319,11 @@ function configure(properties, o) {
 		}
 	}
 }
-
 // Helpers
 
 var slice = Array.prototype.slice;
+
+
 
 function $(expr, con) {
 	return typeof expr === "string"? (con || document).querySelector(expr) : expr || null;
@@ -372,6 +405,25 @@ if (typeof Document !== 'undefined') {
 		document.addEventListener("DOMContentLoaded", init);
 	}
 }
+
+ // for contenteditable div or input place the caret at end of div text content
+$.placeCaretAtEnd = function(el) {
+	var range, sel, textRange;
+    el.focus();
+    if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+		range = document.createRange();
+		range.selectNodeContents(el);
+		range.collapse(false);
+		sel = window.getSelection();
+		sel.removeAllRanges();
+		return sel.addRange(range);
+	} else if (typeof document.body.createTextRange !== "undefined") {
+	    textRange = document.body.createTextRange();
+	    textRange.moveToElementText(el);
+	    textRange.collapse(false);
+	    return textRange.select();
+	}
+  }
 
 _.$ = $;
 _.$$ = $$;
